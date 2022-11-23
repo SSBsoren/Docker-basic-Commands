@@ -1,0 +1,192 @@
+(1)set up the docker repository
+
+sudo apt-get update
+
+sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+
+ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+(2)Install Docker CE
+sudo apt-get update
+sudo apt-get install docker-ce
+sudo service docker start
+
+//
+sudo apt remove docker.io
+sudo apt audoremove
+
+sudo apt-get purge -y docker-engine docker docker.io docker-ce docker-ce-cli
+sudo apt-get autoremove -y --purge docker-engine docker docker.io docker-ce  
+
+-------------------------------------------------------------------------------------
+Docker objects--
+Pull an image and work with it
+ 
+$ sudo docker pull ubuntu
+$ sudo docker images //view docker imgs
+$ sudo docker run -it -d ubuntu //flag intrective and detecher *create container
+$ sudo docker ps //check docker statusdocker
+$ sudo docker run -it -d --name ubuntu-sagen-container ubuntu //create container with name 
+$ ssudo //create container with name and port
+$ sudo docker exec -ti ubuntu-sgn-container bash // going inside the container
+as root $ docker stop CONTAINER_ID// stop the container
+$ docker ps -a //display all container 
+$ docker start CONTAINER_ID/NAME //start the container
+$ docker kill CONTAINER_ID/NAME //force-fully stop the container
+$ docker rm  -f CONTAINER_ID/NAME //force-fully remove the container
+$ docker commit CONTAINER_ID/NAME custom-image
+$ docker rmi  IMAGE_ID/NAME  //remove the image
+$ docker rmi  -f IMAGE_ID/NAME   //force-fully remove the image
+
+
+--------------------------------------------------------------------------------
+Docker-hub
+
+Pro tip
+You can push a new image to this repository using the CLI
+
+$docker tag local-image:tagname new-repo:tagname
+$docker push new-repo:tagname
+Make sure to change tagname with your desired image repository tag.
+----------------------------------------------------------------------------------
+
+//intall nginx
+$ apt install nginx -y
+$ service nginx status // check status
+
+____________
+Spring Boot project push to Docker-hub
+docker build -t sagen0211/visitor-management:0.0.1 -f Dockerfile .
+docker build -t sagen0211/hlw-docker:0.0.1 -f  Dockerfile .
+docker login -u "sagen0211" -p "DevSagen@2022" docker.io
+
+docker tag visitor-management:latest sagen0211/hlw-docker:0.0.1
+docker push sagen0211/hlw-docker:0.0.1
+
+------------------------------------------------------
+Docker pull image from docker-hub
+
+docker pull sagen0211/hlw-docker:latest//pulling from docker hub
+sudo docker container ls -a //view status
+sudo docker rm -f  spring-boot-docker //Remove
+sudo docker run -p 80:9191 --name vmapp sagen0211/hlw-docker:0.0.1 //Run the spring project
+
+ex-
+visitor-management:latest
+
+Step-1-------------------------------------------------------------------------------------
+Postgres in docker
+docker pull postgres
+docker run --name postgresql -e POSTGRES_USER=postgres  -e POSTGRES_PASSWORD=docker@2022  -p 5432:5432 -v /data:/var/lib/postgresql/data -d postgres
+docker run -p 5050:80  -e "PGADMIN_DEFAULT_EMAIL=name@example.com" -e "PGADMIN_DEFAULT_PASSWORD=admin"  -d dpage/pgadmin4
+---------------------------
+host: host.docker.internal
+database: postgres
+user: postgres
+password: docker@2022
+
+--------------------------------------
+To go inside the container 
+
+docker exec -it container_id bash
+root@05b3a3471f6f:/# psql -U postgres
+postgres-# CREATE DATABASE mytest;
+postgres-# \q
+
+---------------
+docker exec -i mypostgres psql -U postgres -d mydb < backup.sql
+---------------
+
+Step 3---------------------------------------
+$mvn clean install -DskipTests=true
+
+$mvn clean install
+$mvn spring-boot:run
+$docker build . -t sagen0211/employee-service
+
+---Build image using buildpacks-----------------------
+<image>
+<name>sagen0211/${project.artifactId}</name>
+</image>
+---
+mvn spring-boot:build-image
+--------------------------------------------------------------------------
+
+mvn clean install
+mvn spring-boot:run
+java -jar target/accounts-0.0.1-SNAPSHOT.jar
+
+docker build . -t sagen0211/accounts-0.0.1
+docker build -t sagen0211/vm-app:08112022 .    //Build the spring boot project images
+docker images inspect <imagesId>
+
+
+docker run -p 80:9191 --name spring-boot-docker sagen0211/hlw-docker:0.0.1 //Run the spring project
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+-->Installing Docker-Compose.
+    Get the latest one from here https://github.com/docker/compose/releases
+
+sudo curl -L https://github.com/docker/compose/releases/download/1.20.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+ubuntu@ip-172-31-38-233:~$ mkdir project
+ubuntu@ip-172-31-38-233:~$ cd project
+ubuntu@ip-172-31-38-233:~/project$ nano docker-compose.yml
+
+------docker-compose.yml--------------------------------
+version: '3.3'
+services:
+  app:
+    container_name: visitor-management
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/visitor-management
+    image: sagen0211/visitor-management
+    build: .
+    ports:
+      - "8080:8080"
+    links:
+      - db
+    depends_on:
+      - db
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=docker@2022
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=visitor-management
+---Dockerfile---------------------------------------------------------------------------------------------------
+FROM openjdk:8-jdk-alpine
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT [ "java", "-jar",  "/app.jar"]
+-------------------------------------------------------------------------------------------------------------------
+
+
+
+3. Get inside the postgres docker container.
+
+docker exec -it my-postgres bash
+4. List all databases for postgres user.
+
+psql -U postgres -l
+5. Choose the relevant db you want to use.
+
+psql -U postgres -d <database-name>
+6. Get all the tables of this database using command /d as shown below.
+
+$<database-name>=# /d
+7. To view the schema of a specific table.
+
+$ \d <table-name>
+8. To quit the sql terminal on *nux/Mac machine.
+
+ctrl+d
